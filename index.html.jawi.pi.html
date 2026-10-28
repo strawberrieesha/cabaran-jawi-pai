@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akademi Jawi & Khat Interaktif - Edisi Komprehensif</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts for Calligraphy & Jawi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;600;700&family=Fredoka:wght@400;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&family=Poppins:wght@400;500;600;700&family=Reem+Kufi:wght@500;700&display=swap" rel="stylesheet">
+
+    <script>
+        function switchTab(tabName) {
+            const tabs = ['nota', 'penukar', 'khat', 'permainan', 'jawapan'];
+            tabs.forEach(t => {
+                const sec = document.getElementById(`sec-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                if (sec) sec.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+            });
+
+            const selectedSec = document.getElementById(`sec-${tabName}`);
+            const selectedBtn = document.getElementById(`tab-${tabName}`);
+            
+            if (selectedSec) selectedSec.classList.remove('hidden');
+            if (selectedBtn) selectedBtn.classList.add('active');
+
+            if (tabName === 'khat') {
+                setTimeout(initKhatStudioCanvas, 100);
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', 'Fredoka', sans-serif;
+            background-color: #f0fdf4;
+            user-select: none;
+        }
+        .font-jawi {
+            font-family: 'Amiri', 'Noto Naskh Arabic', serif;
+            direction: rtl;
+        }
+        .font-thuluth {
+            font-family: 'Aref Ruqaa', 'Amiri', serif;
+            direction: rtl;
+        }
+        .tab-btn.active {
+            background-color: #047857;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+        }
+        .game-btn.active {
+            background-color: #0d9488;
+            color: white;
+            box-shadow: 0 4px 10px rgba(13, 148, 136, 0.3);
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #d1fae5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 4px;
+        }
+        .hidden-item-found {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+        .level-badge-rendah { background-color: #10b981; color: white; }
+        .level-badge-sederhana { background-color: #f59e0b; color: white; }
+        .level-badge-tinggi { background-color: #ef4444; color: white; }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between bg-emerald-50/50">
+
+    <!-- Header / Navbar -->
+    <header class="bg-emerald-800 text-white shadow-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3 rtl:space-x-reverse">
+                <div class="bg-amber-400 text-emerald-950 p-2.5 rounded-2xl font-bold text-2xl shadow-inner animate-pulse">
+                    <i class="fa-solid fa-pen-nib"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold leading-tight flex items-center gap-2">
+                        <span>Akademi Jawi & Khat</span>
+                        <span class="bg-amber-400 text-slate-900 text-xs px-2.5 py-0.5 rounded-full font-black uppercase tracking-wide">Edisi Lengkap</span>
+                    </h1>
+                    <p class="text-xs text-emerald-100">Portal Pembelajaran Asas Hijaiyah, Sejarah Jawi, Khat & Permainan Beraras</p>
+                </div>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <nav class="flex flex-wrap gap-1.5 justify-center bg-emerald-900/80 p-1.5 rounded-2xl text-xs md:text-sm font-semibold border border-emerald-700/50">
+                <button onclick="switchTab('nota')" id="tab-nota" class="tab-btn active px-3.5 py-2 rounded-xl transition duration-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-book-open-reader text-amber-300"></i> Nota Komprehensif
+                </button>
+                <button onclick="switchTab('penukar')" id="tab-penukar" class="tab-btn px-3.5 py-2 rounded-xl transition duration-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-language text-sky-300"></i> Penukar Rumi-Jawi
+                </button>
+                <button onclick="switchTab('khat')" id="tab-khat" class="tab-btn px-3.5 py-2 rounded-xl transition duration-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles text-purple-300"></i> Studio Khat Auto
+                </button>
+                <button onclick="switchTab('permainan')" id="tab-permainan" class="tab-btn px-3.5 py-2 rounded-xl transition duration-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-gamepad text-amber-400"></i> Permainan Beraras (3)
+                </button>
+                <button onclick="switchTab('jawapan')" id="tab-jawapan" class="tab-btn px-3.5 py-2 rounded-xl transition duration-200 flex items-center gap-1.5">
+                    <i class="fa-solid fa-square-check text-emerald-300"></i> Skema & Panduan
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+        <!-- ================= BAHAGIAN 1: NOTA PEMBELAJARAN ================= -->
+        <section id="sec-nota" class="space-y-8">
+            
+            <!-- Banner Pengenalan -->
+            <div class="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-900 text-white rounded-3xl p-6 md:p-8 shadow-xl border-b-8 border-amber-400 relative overflow-hidden">
+                <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                    <div class="space-y-3 max-w-2xl">
+                        <div class="inline-flex items-center gap-2 bg-amber-400/20 text-amber-300 text-xs font-bold px-3 py-1 rounded-full border border-amber-400/30">
+                            <i class="fa-solid fa-star"></i> Modul Pengajian Tulisan Jawi & Seni Khat Islam
+                        </div>
+                        <h2 class="text-2xl md:text-4xl font-extrabold leading-tight">Penguasaan Asas Jawi, Sambungan Huruf, Sejarah & Seni Khat</h2>
+                        <p class="text-emerald-100 text-xs md:text-sm leading-relaxed">
+                            Panduan lengkap merangkumi pengenalan huruf Hijaiyah, peraturan sambungan huruf, sejarah perkembangan Jawi di Malaysia, serta sejarah dan variasi Seni Khat Islam.
+                        </p>
+                    </div>
+                    <div class="font-jawi text-4xl md:text-5xl text-amber-300 font-bold bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/20 text-center shadow-2xl leading-snug">
+                        اقرأ وارتَقِ فِي عَالَمِ الْجَاوِي
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODUL 1: PENGENALAN HURUF HIJAIYAH & JAWI -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-l-8 border-teal-600 space-y-6">
+                <div class="flex items-center gap-3 border-b pb-4">
+                    <div class="bg-teal-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow"><i class="fa-solid fa-font"></i></div>
+                    <div>
+                        <span class="text-xs font-bold text-teal-700 uppercase tracking-wider">Modul Jawi 1</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800">Pengenalan Huruf Hijaiyah & Huruf Tambahan Jawi</h3>
+                    </div>
+                </div>
+
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed">
+                    Tulisan Jawi dibentuk daripada 29 huruf Hijaiyah yang berasal daripada Bahasa Arab, ditambah dengan **6 huruf khas** yang dicipta oleh alim ulama Alam Melayu untuk mewakili bunyi-bunyi khas dalam Bahasa Melayu.
+                </p>
+
+                <!-- 6 Huruf Tambahan Jawi -->
+                <div class="bg-teal-50 p-5 rounded-2xl border border-teal-200 space-y-3">
+                    <h4 class="font-bold text-teal-950 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-teal-600"></i> 6 Huruf Tambahan Khas Tulisan Jawi:
+                    </h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 text-center">
+                        <div class="bg-white p-3 rounded-xl border border-teal-200 shadow-sm">
+                            <span class="font-jawi text-3xl font-bold text-teal-800 block">چ</span>
+                            <span class="text-xs font-bold text-slate-600">Cha (c)</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-teal-200 shadow-sm">
+                            <span class="font-jawi text-3xl font-bold text-teal-800 block">ݢ</span>
+                            <span class="text-xs font-bold text-slate-600">Ga (g)</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-teal-200 shadow-sm">
+                            <span class="font-jawi text-3xl font-bold text-teal-800 block">ڤ</span>
+                            <span class="text-xs font-bold text-slate-600">Pa (p)</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-teal-200 shadow-sm">
+                            <span class="font-jawi text-3xl font-bold text-teal-800 block">ۏ</span>
+                            <span class="text-xs font-bold text-slate-600">Va (v)</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-teal-200 shadow-sm">
+                            <span class="font-jawi text-3xl font-bold text-teal-800 block">ڠ</span>
+                            <span class="text-xs font-bold text-slate-600">Nga (ng)</span>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-teal-200 shadow-sm">
+                            <span class="font-jawi text-3xl font-bold text-teal-800 block">ڽ</span>
+                            <span class="text-xs font-bold text-slate-600">Nya (ny)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODUL 2: KAEDAH SAMBUNGAN HURUF (3 KATEGORI UTAMA) -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-l-8 border-rose-500 space-y-6">
+                <div class="flex items-center gap-3 border-b pb-4">
+                    <div class="bg-rose-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow"><i class="fa-solid fa-link"></i></div>
+                    <div>
+                        <span class="text-xs font-bold text-rose-600 uppercase tracking-wider">Modul Jawi 2</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800">Kaedah & Klasifikasi Sambungan Huruf Jawi</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    
+                    <!-- Kategori 1: Boleh Disambung Depan & Belakang -->
+                    <div class="bg-emerald-50 p-5 rounded-2xl border border-emerald-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">Kategori 1</span>
+                                <h4 class="font-bold text-emerald-950 text-sm">Boleh Disambung Depan & Belakang (Huruf Mesra / Dua Arah)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                Huruf-huruf ini sangat fleksibel dan <strong>boleh disambung dengan huruf sebelum mahupun selepasnya</strong> di awal, tengah, atau akhir perkataan.
+                            </p>
+                            <div class="font-jawi text-2xl text-emerald-800 font-bold bg-white p-3 rounded-xl border border-emerald-200 leading-loose text-center shadow-inner">
+                                ب ت ث ج ح خ س ش ص ض ط ظ ع غ ف ق ک ل م ن هـ ي ڤ چ ڠ ڽ
+                            </div>
+                        </div>
+                        <div class="bg-emerald-200/60 p-2 rounded-xl text-center text-xs text-emerald-950 font-semibold">
+                            Contoh: <span class="font-jawi text-base font-bold">مَكْتَبَةٌ ← م + ك + ت + ب + ة</span>
+                        </div>
+                    </div>
+
+                    <!-- Kategori 2: Boleh Disambung Dari Belakang Sahaja -->
+                    <div class="bg-amber-50 p-5 rounded-2xl border border-amber-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-amber-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">Kategori 2</span>
+                                <h4 class="font-bold text-amber-950 text-sm">Boleh Disambung Dari Belakang Sahaja ("Huruf Sombong")</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                Huruf ini <strong>BOLEH menerima sambungan dari huruf SEBELUMNYA</strong> (belakang), tetapi <strong>TIDAK BOLEH menyambung ke huruf SELEPASNYA</strong> (depan).
+                            </p>
+                            <div class="font-jawi text-3xl text-amber-800 font-bold bg-white p-3 rounded-xl border border-amber-200 text-center shadow-inner tracking-widest">
+                                ا د ذ ر ز و ۏ
+                            </div>
+                            <p class="text-[11px] text-amber-900 font-bold mt-2 text-center">Mnemonic: "A - Da - Dza - Ra - Za - Wa - Va"</p>
+                        </div>
+                        <div class="bg-amber-200/60 p-2 rounded-xl text-center text-xs text-amber-950 font-semibold">
+                            Contoh: <span class="font-jawi text-base font-bold">دَارٌ ← د (terpisah) + ا + ر</span>
+                        </div>
+                    </div>
+
+                    <!-- Kategori 3: Tidak Boleh Disambung Langsung -->
+                    <div class="bg-rose-50 p-5 rounded-2xl border border-rose-200 space-y-3 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="bg-rose-600 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full">Kategori 3</span>
+                                <h4 class="font-bold text-rose-950 text-sm">Huruf Bebas / Berasingan (Hamzah & Ta Marbutah Terpisah)</h4>
+                            </div>
+                            <p class="text-xs text-slate-600 leading-relaxed mb-3">
+                                Huruf **Hamzah (ء)** secara umumnya ditulis bersendirian dan tidak disambung dengan mana-mana huruf sebelum atau selepasnya dalam ejaan Jawi.
+                            </p>
+                            <div class="font-jawi text-4xl text-rose-800 font-bold bg-white p-3 rounded-xl border border-rose-200 text-center shadow-inner">
+                                ء
+                            </div>
+                        </div>
+                        <div class="bg-rose-200/60 p-2 rounded-xl text-center text-xs text-rose-950 font-semibold">
+                            Contoh: <span class="font-jawi text-base font-bold">دُعَاءٌ / 💡 دَاءٌ</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- MODUL 3: SEJARAH PENULISAN JAWI DI MALAYSIA & NOTA PENTING -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-l-8 border-sky-600 space-y-6">
+                <div class="flex items-center gap-3 border-b pb-4">
+                    <div class="bg-sky-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow"><i class="fa-solid fa-hourglass-half"></i></div>
+                    <div>
+                        <span class="text-xs font-bold text-sky-700 uppercase tracking-wider">Modul Jawi 3</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800">Sejarah Perkembangan Tulisan Jawi di Malaysia & Nota Penting</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Sejarah Jawi -->
+                    <div class="bg-sky-50/70 p-5 rounded-2xl border border-sky-200 space-y-3">
+                        <h4 class="font-bold text-sky-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-monument text-sky-600"></i> Linimasa Sejarah Penulisan Jawi
+                        </h4>
+                        <ul class="text-xs text-slate-700 space-y-3 leading-relaxed border-l-2 border-sky-400 pl-4">
+                            <li>
+                                <strong class="text-sky-950 font-bold block">1. Kedatangan Islam ke Alam Melayu (Abad ke-10 hingga 13)</strong>
+                                Tulisan Jawi diperkenalkan bersama penyebaran Islam oleh pedagang Arab dan India. Abjad Arab disesuaikan dengan lidah Melayu.
+                            </li>
+                            <li>
+                                <strong class="text-sky-950 font-bold block">2. Batu Bersurat Terengganu (1303 Masehi)</strong>
+                                Bukti tertua tulisan Jawi di Malaysia yang mengandungi undang-undang Islam. Ia membuktikan Jawi telah digunakan secara rasmi di Terengganu.
+                            </li>
+                            <li>
+                                <strong class="text-sky-950 font-bold block">3. Zaman Kegemilangan Kesultanan Melayu Melaka</strong>
+                                Tulisan Jawi menjadi tulisan rasmi pentadbiran, perundangan (Hukum Kanun Melaka), surat diplomatik raja-raja Melayu, dan karya sastera.
+                            </li>
+                            <li>
+                                <strong class="text-sky-950 font-bold block">4. Ejaan Za'ba & Dewan Bahasa dan Pustaka (DBP)</strong>
+                                Pendeta Za'ba menyusun sistem ejaan Jawi pada tahun 1930-an, yang kemudiannya diperkemaskan oleh DBP melalui Pedoman Ejaan Jawi yang Disempurnakan (1988).
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Nota Penting Tambahan -->
+                    <div class="bg-amber-50/70 p-5 rounded-2xl border border-amber-200 space-y-3">
+                        <h4 class="font-bold text-amber-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-600"></i> Nota Tambahan & Hukum Ejaan Penting
+                        </h4>
+                        <div class="space-y-2.5 text-xs text-slate-700">
+                            <div class="bg-white p-3 rounded-xl border border-amber-200">
+                                <strong class="text-amber-900 block font-bold">1. Huruf Saksi (Vokal Jawi):</strong>
+                                Huruf Alif (ا), Wau (و), dan Ya (ي) bertindak sebagai huruf vokal bagi mewakili bunyi [a], [i], [u], [e], dan [o].
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-amber-200">
+                                <strong class="text-amber-900 block font-bold">2. Kata Pinjaman Bahasa Inggeris:</strong>
+                                Mengeja mengikut **sebutan fonetik asal**, bukannya ejaan huruf Rumi. Vokal 'a' di tengah suku kata tertutup secara amnya digugurkan (cth: *Komputer* = <span class="font-jawi text-base font-bold">کومڤوتر</span>).
+                            </div>
+                            <div class="bg-white p-3 rounded-xl border border-amber-200">
+                                <strong class="text-amber-900 block font-bold">3. Kedudukan Huruf Hamzah (ء):</strong>
+                                Mempunyai 5 kedudukan: di atas Alif (<span class="font-jawi font-bold">أ</span>), di bawah Alif (<span class="font-jawi font-bold">إ</span>), tiga suku dari garisan, setara/sejajar garisan, dan berumah (<span class="font-jawi font-bold">ئ</span>).
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODUL 4: SENI KHAT NASAKH, THULUTH & KHAT-KHAT LAIN -->
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-l-8 border-amber-500 space-y-6">
+                <div class="flex items-center gap-3 border-b pb-4">
+                    <div class="bg-amber-500 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow"><i class="fa-solid fa-crown"></i></div>
+                    <div>
+                        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Modul Seni Khat</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800">Seni Khat Nasakh, Khat Thuluth & Kepelbagaian Jenis Khat</h3>
+                    </div>
+                </div>
+
+                <!-- Perbandingan Nasakh vs Thuluth -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    
+                    <!-- Khat Nasakh -->
+                    <div class="bg-emerald-50/80 p-6 rounded-2xl border border-emerald-200 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-emerald-900 text-lg">1. Khat Nasakh (خط النسخ)</h4>
+                            <span class="bg-emerald-600 text-white text-xs px-2.5 py-1 rounded-full font-bold">Paling Mudah Dibaca</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            <strong>Sejarah & Pengasas:</strong> Dinamakan 'Nasakh' kerana fungsinya untuk *menyalin* atau membukukan tulisan. Diperkemaskan oleh Ibnu Muqlah pada abad ke-10 Masehi.
+                        </p>
+                        <div class="bg-white p-4 rounded-xl border border-emerald-200 space-y-2">
+                            <span class="text-xs font-bold text-emerald-950 block">Ciri-Ciri Utama Khat Nasakh:</span>
+                            <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                <li>Bentuk huruf yang amat jelas, tegak, dan seimbang.</li>
+                                <li>Mudah ditulis, dibaca, dan dipelajari oleh murid.</li>
+                                <li>Digunakan sebagai penulisan rasmi Mushaf Al-Quran & buku teks sekolah.</li>
+                            </ul>
+                        </div>
+                        <div class="font-jawi text-3xl text-emerald-800 text-center font-bold pt-1">
+                            العِلْمُ نُوْرٌ وَالْجَهْلُ عَارٌ
+                        </div>
+                    </div>
+
+                    <!-- Khat Thuluth -->
+                    <div class="bg-purple-50/80 p-6 rounded-2xl border border-purple-200 space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-purple-900 text-lg">2. Khat Thuluth (خط الثلث)</h4>
+                            <span class="bg-purple-600 text-white text-xs px-2.5 py-1 rounded-full font-bold">Raja Seni Khat</span>
+                        </div>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            <strong>Sejarah & Pengasas:</strong> Dinamakan 'Thuluth' (satu pertiga) kerana saiz mata pen yang digunakan bersaiz 1/3 pen tradisional. Ditemui oleh Ibn Muqlah dan disempurnakan oleh Ibn al-Bawwab.
+                        </p>
+                        <div class="bg-white p-4 rounded-xl border border-purple-200 space-y-2">
+                            <span class="text-xs font-bold text-purple-950 block">Ciri-Ciri Utama Khat Thuluth:</span>
+                            <ul class="text-xs text-slate-700 space-y-1 list-disc list-inside">
+                                <li>Huruf bertingkat, bersilang, dan mempunyai kecondongan berseni.</li>
+                                <li>Dihiasi dengan baris harakat lengkap & perhiasan *Tasykil*.</li>
+                                <li>Digunakan untuk tajuk surah, seni bina masjid, dan hiasan kad.</li>
+                            </ul>
+                        </div>
+                        <div class="font-thuluth text-3xl text-purple-800 text-center font-bold pt-1">
+                            نَصْرٌ مِّنَ اللَّهِ وَفَتْحٌ قَرِيبٌ
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Contoh Khat Lain -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-3">
+                    <h4 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-palette text-amber-500"></i> Jenis-Jenis Khat Islam Lain Yang Populer:
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 text-center space-y-1">
+                            <span class="font-bold text-xs text-amber-800 block">Khat Kufi (خط كوفي)</span>
+                            <p class="text-[11px] text-slate-500">Khat tertua, berbentuk geometri, berkotak, dan tegak kaku.</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 text-center space-y-1">
+                            <span class="font-bold text-xs text-amber-800 block">Khat Riq'ah (خط الرقعة)</span>
+                            <p class="text-[11px] text-slate-500">Khat ringkas, pantas ditulis, tanpa baris, guna harian.</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 text-center space-y-1">
+                            <span class="font-bold text-xs text-amber-800 block">Khat Diwani (خط ديواني)</span>
+                            <p class="text-[11px] text-slate-500">Mempunyai lengkungan bulat bertindih, digunakan istana Uthmaniyyah.</p>
+                        </div>
+                        <div class="bg-white p-3 rounded-xl border border-slate-200 text-center space-y-1">
+                            <span class="font-bold text-xs text-amber-800 block">Khat Farisi (خط فارسی)</span>
+                            <p class="text-[11px] text-slate-500">Berasal dari Parsi, lembut, miring dan memanjang nipis.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= BAHAGIAN 2: PENUKAR BAHASA MELAYU KE JAWI ================= -->
+        <section id="sec-penukar" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-t-8 border-teal-600 space-y-6">
+                <div>
+                    <span class="bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Enjin Transliterasi Pintar (Boleh Disunting)</span>
+                    <h2 class="text-2xl font-bold text-slate-800 mt-2 flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-teal-600"></i>
+                        <span>Penukar Rumi (Melayu) ke Tulisan Jawi & Penyunting Teks</span>
+                    </h2>
+                    <p class="text-slate-600 text-sm mt-1">Taip ayat atau perkataan Bahasa Melayu di bawah untuk ditukar ke Jawi. Anda juga boleh <strong>menyunting (*edit*) terus hasil Jawi</strong> di petak kanan jika ingin membuat sebarang pembetulan ejaan!</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="rumiInput" class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-keyboard text-teal-600"></i> Masukkan Teks Rumi Bahasa Melayu:
+                        </label>
+                        <textarea id="rumiInput" rows="5" class="w-full p-4 border-2 border-slate-200 rounded-2xl focus:border-teal-500 focus:outline-none shadow-inner text-base" placeholder="Taip di sini... Contoh: Saya belajar tulisan jawi dan khat nasakh di sekolah."></textarea>
+                        
+                        <div class="flex flex-wrap gap-2 text-xs pt-1">
+                            <span class="text-slate-500 self-center font-semibold">Cuba contoh:</span>
+                            <button onclick="setSampleRumi('Pendidikan Islam Sekolah Rendah')" class="bg-slate-100 hover:bg-teal-100 text-slate-700 px-2.5 py-1 rounded-lg">Pendidikan Islam</button>
+                            <button onclick="setSampleRumi('Teknologi komputer dan internet')" class="bg-slate-100 hover:bg-teal-100 text-slate-700 px-2.5 py-1 rounded-lg">Teknologi ICT</button>
+                            <button onclick="setSampleRumi('Seni khat nasakh dan thuluth sangat indah')" class="bg-slate-100 hover:bg-teal-100 text-slate-700 px-2.5 py-1 rounded-lg">Seni Khat</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label for="jawiOutput" class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-pen-to-square text-teal-600"></i> Hasil Ejaan Jawi (Boleh Sunting):
+                                </label>
+                                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full">
+                                    <i class="fa-solid fa-pencil mr-1"></i>Sunting di sini
+                                </span>
+                            </div>
+                            <textarea id="jawiOutput" rows="5" dir="rtl" class="w-full p-4 bg-teal-50/60 border-2 border-teal-200 focus:border-teal-500 focus:bg-white focus:outline-none rounded-2xl font-jawi text-2xl md:text-3xl text-teal-950 leading-relaxed shadow-sm text-right resize-none" placeholder="جاوي اءوتڤوت اکن ممڤارکن دسينى..."></textarea>
+                        </div>
+
+                        <div class="flex flex-wrap gap-2 justify-end pt-2">
+                            <button onclick="copyJawiText()" class="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-copy"></i> Salin Jawi
+                            </button>
+                            <button onclick="sendToKhatStudio()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 px-5 py-2 rounded-xl text-xs font-black shadow transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Hantar ke Studio Khat!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================= BAHAGIAN 3: STUDIO KHAT NASAKH & THULUTH AUTO GENERATOR ================= -->
+        <section id="sec-khat" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-t-8 border-amber-500 space-y-6">
+                
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full uppercase">Penjana & Poster Seni Khat</span>
+                            <span class="bg-emerald-600 text-white text-xs px-2.5 py-0.5 rounded-md font-bold">Nasakh & Thuluth</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-1">Studio Generasi Khat & Hiasan Poster</h2>
+                        <p class="text-slate-600 text-sm">Masukkkan teks Jawi → Pilih Gaya Khat → Reka Poster Seni Klasik Islamik!</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 bg-amber-50 p-2 rounded-2xl border border-amber-200">
+                        <button onclick="setKhatStyle('nasakh')" id="btnStyleNasakh" class="px-4 py-2 rounded-xl font-bold text-xs bg-emerald-700 text-white shadow">
+                            <i class="fa-solid fa-pen-nib mr-1"></i> Khat Nasakh
+                        </button>
+                        <button onclick="setKhatStyle('thuluth')" id="btnStyleThuluth" class="px-4 py-2 rounded-xl font-bold text-xs bg-white text-amber-900 hover:bg-amber-100">
+                            <i class="fa-solid fa-crown mr-1"></i> Khat Thuluth
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="font-bold text-slate-700 flex items-center gap-1">
+                            <i class="fa-solid fa-edit text-amber-600"></i> Edit Teks Jawi Untuk Poster:
+                        </label>
+                        <input type="text" id="khatTextInput" value="العِلْمُ نُوْرٌ" oninput="renderGeneratedKhat()" class="w-full p-3 font-jawi text-2xl border-2 border-amber-300 rounded-xl focus:outline-none focus:border-amber-500 bg-white text-right">
+                    </div>
+
+                    <div class="space-y-2 flex flex-col justify-center">
+                        <span class="font-bold text-slate-700">Warna Teks & Saiz:</span>
+                        <div class="flex items-center gap-2">
+                            <input type="color" id="khatColorInput" value="#1e293b" onchange="renderGeneratedKhat()" class="w-10 h-10 rounded-xl cursor-pointer border-0">
+                            <select id="khatFontSize" onchange="renderGeneratedKhat()" class="bg-white border p-2 rounded-xl text-xs font-semibold">
+                                <option value="55">Saiz: Sederhana</option>
+                                <option value="75" selected>Saiz: Besar</option>
+                                <option value="95">Saiz: Sangat Besar</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-emerald-50/80 p-4 rounded-2xl border border-emerald-100 text-xs">
+                    <div>
+                        <span class="font-bold text-emerald-900 block mb-1"><i class="fa-solid fa-image text-emerald-600 mr-1"></i> Gambar Latar Belakang:</span>
+                        <input type="file" id="posterBgUploader" accept="image/*" class="text-xs text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-xl file:border-0 file:bg-emerald-600 file:text-white file:cursor-pointer hover:file:bg-emerald-700">
+                    </div>
+
+                    <div>
+                        <span class="font-bold text-emerald-900 block mb-1"><i class="fa-solid fa-vector-square text-emerald-600 mr-1"></i> Bingkai Hiasan Islamik:</span>
+                        <select id="khatFrameSelect" onchange="renderGeneratedKhat()" class="w-full p-2 bg-white border rounded-xl text-xs font-semibold">
+                            <option value="gold">Bingkai Emas Islamik</option>
+                            <option value="emerald">Bingkai Zamrud Klasik</option>
+                            <option value="royal">Bingkai Diraja Ungu</option>
+                            <option value="none">Tanpa Bingkai</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <span class="font-bold text-emerald-900 block mb-1"><i class="fa-solid fa-stamp text-emerald-600 mr-1"></i> Cap Mohor Penghargaan:</span>
+                        <div class="flex gap-2">
+                            <button onclick="addStampToKhat('ممتاز')" class="stamp-btn bg-amber-500 text-slate-950 font-black px-3 py-1.5 rounded-xl shadow text-xs">Cap 'ممتاز'</button>
+                            <button onclick="addStampToKhat('بارك الله')" class="stamp-btn bg-emerald-600 text-white font-black px-3 py-1.5 rounded-xl shadow text-xs">Cap 'بارك الله'</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative w-full overflow-hidden border-4 border-amber-300 rounded-3xl bg-amber-50/30 shadow-inner flex justify-center items-center">
+                    <canvas id="khatCanvas" class="w-full h-[420px] md:h-[480px] relative z-10"></canvas>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center gap-3">
+                    <div class="flex gap-2 text-xs">
+                        <button onclick="clearKhatDrawing()" class="px-3 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-300 transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Reset Lakaran
+                        </button>
+                        <button onclick="removePosterBg()" class="px-3 py-2 bg-rose-100 text-rose-700 font-bold rounded-xl hover:bg-rose-200 transition">
+                            <i class="fa-solid fa-image-slash mr-1"></i> Buang Latar Belakang
+                        </button>
+                    </div>
+
+                    <button onclick="downloadKhatPoster()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl font-extrabold shadow-lg transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-file-arrow-down"></i> Muat Turun Poster Khat (PNG)
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ================= BAHAGIAN 4: PUSAT PERMAINAN BERARAS (3 PERMAINAN TERPILIH) ================= -->
+        <section id="sec-permainan" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md space-y-6">
+                
+                <!-- Game Selection Header -->
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b pb-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-amber-400 text-slate-950 font-black text-xs px-2.5 py-0.5 rounded-full uppercase">Pusat Permainan Beraras</span>
+                            <span class="text-xs font-bold text-slate-500">Pilihan Aras: Rendah, Sederhana & Tinggi</span>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 mt-1">Pilih Permainan & Tetapkan Aras Kefahaman Anda!</h2>
+                    </div>
+                    
+                    <!-- Buttons Switch Games -->
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="switchMiniGame('hidden_objects')" id="gbtn-hidden_objects" class="game-btn active px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow">
+                            <i class="fa-solid fa-magnifying-glass mr-1"></i> 1. Hidden Objects
+                        </button>
+                        <button onclick="switchMiniGame('escape_room')" id="gbtn-escape_room" class="game-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+                            <i class="fa-solid fa-door-closed mr-1"></i> 2. Escape Room
+                        </button>
+                        <button onclick="switchMiniGame('spelling_bee')" id="gbtn-spelling_bee" class="game-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">
+                            <i class="fa-solid fa-spell-check mr-1"></i> 3. Jawi Spelling Bee
+                        </button>
+                        <button onclick="switchMiniGame('challenge')" id="gbtn-challenge" class="game-btn px-4 py-2 rounded-xl text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300">
+                            <i class="fa-solid fa-trophy mr-1"></i> 4. Cabaran Markah (Tanpa Aras)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= GAME 1: JAWI HIDDEN OBJECTS (BERARAS) ================= -->
+                <div id="game-hidden_objects-wrapper" class="space-y-4">
+                    <div class="bg-teal-50 p-4 rounded-2xl border border-teal-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                        <div>
+                            <h3 class="font-bold text-teal-950 text-base flex items-center gap-2">
+                                <i class="fa-solid fa-magnifying-glass text-teal-600"></i> Permainan 1: Jawi Hidden Objects (Cari Objek & Padan Maksud)
+                            </h3>
+                            <p class="text-xs text-slate-600 mt-0.5">
+                                Pilih Aras Kesukaran dan cari objek Jawi tersembunyi!
+                            </p>
+                        </div>
+
+                        <!-- Selector Aras Kesukaran -->
+                        <div class="flex items-center gap-2 bg-white p-1.5 rounded-2xl border border-teal-300">
+                            <span class="text-xs font-bold text-slate-600 ml-1">Aras:</span>
+                            <button onclick="setHoLevel('rendah')" id="ho-lvl-rendah" class="px-3 py-1 rounded-xl text-xs font-bold level-badge-rendah shadow">Rendah</button>
+                            <button onclick="setHoLevel('sederhana')" id="ho-lvl-sederhana" class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-600">Sederhana</button>
+                            <button onclick="setHoLevel('tinggi')" id="ho-lvl-tinggi" class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-100 text-slate-600">Tinggi</button>
+                        </div>
+                    </div>
+
+                    <!-- Scene Bilik Tersembunyi -->
+                    <div class="relative w-full h-[420px] rounded-3xl overflow-hidden border-4 border-teal-600 bg-slate-800 shadow-xl flex justify-center items-center">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1200&auto=format&fit=crop" class="w-full h-full object-cover opacity-40" alt="Bilik Makmal">
+                        
+                        <!-- Hotspot Objek Tersembunyi -->
+                        <div id="hoItemsContainer" class="w-full h-full absolute inset-0">
+                            <!-- Items dynamically loaded based on difficulty level -->
+                        </div>
+
+                        <!-- Modal Padanan Soalan -->
+                        <div id="hoModal" class="hidden absolute inset-0 bg-slate-900/90 backdrop-blur-md flex flex-col justify-center items-center p-6 text-white text-center space-y-4 z-30">
+                            <div class="bg-teal-600 text-white p-3 rounded-full text-3xl"><i class="fa-solid fa-puzzle-piece"></i></div>
+                            <h4 class="text-xl font-bold">Objek Jawi Dijumpai: <span id="hoJawiFound" class="font-jawi text-3xl text-amber-300"></span></h4>
+                            <p class="text-xs text-slate-300" id="hoQuestionText">Apakah padanan ejaan Rumi yang tepat bagi perkataan Jawi di atas?</p>
+                            <div id="hoOptions" class="grid grid-cols-2 gap-3 w-full max-w-sm pt-2">
+                                <!-- Loaded via JS -->
+                            </div>
+                        </div>
+
+                        <!-- Completion Overlay -->
+                        <div id="hoComplete" class="hidden absolute inset-0 bg-emerald-900/95 backdrop-blur-md flex flex-col justify-center items-center text-white text-center p-6 space-y-4 z-30">
+                            <div class="bg-amber-400 text-slate-950 p-5 rounded-full text-5xl shadow-2xl animate-bounce"><i class="fa-solid fa-trophy"></i></div>
+                            <h3 class="text-3xl font-extrabold">Syabas & Tahniah!</h3>
+                            <p class="text-sm max-w-md text-emerald-100">Anda telah berjaya menyelesaikan permainan Hidden Objects pada aras yang dipilih!</p>
+                            <button onclick="resetHiddenObjects()" class="bg-amber-400 hover:bg-amber-500 text-slate-950 font-black px-8 py-3 rounded-2xl shadow-xl transition">
+                                <i class="fa-solid fa-rotate-right mr-1"></i> Main Semula
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= GAME 2: JAWI ESCAPE ROOM (BERARAS) ================= -->
+                <div id="game-escape_room-wrapper" class="hidden space-y-4">
+                    <div class="bg-slate-900 text-white p-5 rounded-3xl border-4 border-amber-500 shadow-xl space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-3 gap-2">
+                            <div>
+                                <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-key"></i> Permainan 2: Jawi Escape Room (Bilik Rahsia)
+                                </h3>
+                                <p class="text-xs text-slate-400 mt-0.5">Selesaikan teka-teki mengikut Aras Kefahaman pilihan anda!</p>
+                            </div>
+
+                            <!-- Selector Aras Escape Room -->
+                            <div class="flex items-center gap-2 bg-slate-800 p-1.5 rounded-2xl border border-slate-700">
+                                <span class="text-xs font-bold text-slate-300 ml-1">Aras:</span>
+                                <button onclick="setErLevel('rendah')" id="er-lvl-rendah" class="px-3 py-1 rounded-xl text-xs font-bold level-badge-rendah shadow">Rendah</button>
+                                <button onclick="setErLevel('sederhana')" id="er-lvl-sederhana" class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-700 text-slate-300">Sederhana</button>
+                                <button onclick="setErLevel('tinggi')" id="er-lvl-tinggi" class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-700 text-slate-300">Tinggi</button>
+                            </div>
+                        </div>
+
+                        <div id="erStageContent" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-4">
+                            <!-- Loaded dynamically via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= GAME 3: JAWI SPELLING BEE (BERARAS) ================= -->
+                <div id="game-spelling_bee-wrapper" class="hidden space-y-4">
+                    <div class="bg-slate-900 text-white p-5 rounded-3xl border-4 border-amber-400 shadow-xl space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700 pb-3 gap-2">
+                            <div>
+                                <h3 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-spell-check"></i> Permainan 3: Jawi Spelling Bee
+                                </h3>
+                                <p class="text-xs text-slate-300 mt-0.5">Susun huruf Jawi mengikut urutan ejaan berdasarkan aras kesukaran!</p>
+                            </div>
+
+                            <!-- Selector Aras Spelling Bee -->
+                            <div class="flex items-center gap-2 bg-slate-800 p-1.5 rounded-2xl border border-slate-700">
+                                <span class="text-xs font-bold text-slate-300 ml-1">Aras:</span>
+                                <button onclick="setBeeLevel('rendah')" id="bee-lvl-rendah" class="px-3 py-1 rounded-xl text-xs font-bold level-badge-rendah shadow">Rendah</button>
+                                <button onclick="setBeeLevel('sederhana')" id="bee-lvl-sederhana" class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-700 text-slate-300">Sederhana</button>
+                                <button onclick="setBeeLevel('tinggi')" id="bee-lvl-tinggi" class="px-3 py-1 rounded-xl text-xs font-bold bg-slate-700 text-slate-300">Tinggi</button>
+                            </div>
+                        </div>
+
+                        <div id="spellingBeeContainer" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 text-center space-y-4">
+                            <!-- Loaded via JS -->
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- CABARAN BERMARKAH: 3 PERMAINAN, 3 SOALAN SETIAP SATU -->
+                <div id="game-challenge-wrapper" class="hidden space-y-4">
+                    <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 rounded-3xl p-5 shadow-lg">
+                        <h3 class="font-black text-xl"><i class="fa-solid fa-trophy mr-2"></i> Cabaran Juara Jawi — Tanpa Aras</h3>
+                        <p class="text-sm mt-1">Hidden Objects → Escape Room → Spelling Bee. Setiap permainan: 3 soalan, 3 minit. Betul +5 markah; salah −2 markah dan −5 saat. Selesaikan 3 soalan atau tunggu masa tamat untuk meneruskan cabaran.</p>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-white rounded-xl border p-3"><div class="text-xs font-bold text-slate-500">PERMAINAN</div><div id="challengeStage" class="font-black text-sm">—</div></div>
+                        <div class="bg-white rounded-xl border p-3"><div class="text-xs font-bold text-slate-500">MASA</div><div id="challengeTimer" class="font-black text-2xl tabular-nums text-rose-600">03:00</div></div>
+                        <div class="bg-white rounded-xl border p-3"><div class="text-xs font-bold text-slate-500">MARKAH</div><div id="challengeScore" class="font-black text-2xl text-emerald-700">0</div></div>
+                    </div>
+                    <div id="challengeContent" class="bg-slate-900 text-white rounded-3xl p-5 md:p-7 min-h-[310px] shadow-xl text-center space-y-4">
+                        <div class="text-5xl text-amber-400"><i class="fa-solid fa-medal"></i></div>
+                        <h4 class="text-2xl font-black">Bersedia untuk Cabaran Juara?</h4>
+                        <p class="text-sm text-slate-300">9 soalan dalam 3 permainan. Setiap bahagian mempunyai pemasa sendiri selama 3 minit.</p>
+                        <div class="max-w-sm mx-auto space-y-3 text-left"><label class="block text-sm font-bold">Nama Individu / Kumpulan<input id="challengeStudentName" maxlength="100" autocomplete="off" placeholder="Contoh: Nur Aisyah / Kumpulan Cemerlang" class="w-full mt-1 p-3 rounded-xl text-slate-900" /></label><label class="block text-sm font-bold">Kelas (pilihan)<input id="challengeStudentClass" maxlength="40" placeholder="Contoh: 6 Bestari (boleh dikosongkan)" class="w-full mt-1 p-3 rounded-xl text-slate-900" /></label><p id="challengeSetupError" class="text-rose-300 text-sm" role="alert"></p></div><button onclick="startChallenge()" class="bg-amber-400 text-slate-950 font-black px-7 py-3 rounded-xl">Mula Cabaran!</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= BAHAGIAN 5: SKEMA JAWAPAN & PANDUAN ================= -->
+        <section id="sec-jawapan" class="hidden space-y-6">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-md border-l-8 border-emerald-600 space-y-6">
+                <div class="flex items-center gap-3 border-b pb-4">
+                    <div class="bg-emerald-600 text-white w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-xl shadow">
+                        <i class="fa-solid fa-square-check"></i>
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Panduan Guru & Murid</span>
+                        <h3 class="text-xl md:text-2xl font-bold text-slate-800">Skema Ringkas & Rujukan Guru</h3>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-200 space-y-3">
+                        <h4 class="font-bold text-emerald-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-emerald-600"></i> Ringkasan Huruf Sombong (7 Huruf)
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            Huruf **ا ، د ، ذ ، ر ، ز ، و ، ۏ** hanya boleh menyambung huruf dari arah belakang (kanan). Jika huruf-huruf ini berada di awal atau tengah, huruf selepasnya **mesti ditulis terpisah**.
+                        </p>
+                    </div>
+
+                    <div class="bg-amber-50/60 p-5 rounded-2xl border border-amber-200 space-y-3">
+                        <h4 class="font-bold text-amber-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-star text-amber-600"></i> Panduan Perbezaan Nasakh & Thuluth
+                        </h4>
+                        <p class="text-xs text-slate-600 leading-relaxed">
+                            <strong>Nasakh:</strong> Bersifat praktikal, jelas, mudah dibaca, kegunaan rasmi penulisan. <br>
+                            <strong>Thuluth:</strong> Bersifat hiasan, berlingkar, tinggi keseniannya, kegunaan seni bina dan tajuk.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-emerald-950 text-emerald-300 py-6 border-t border-emerald-800 mt-10">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2 text-xs">
+            <p class="font-bold">Akademi Jawi & Khat Interaktif — Modul Pembelajaran Pendidikan Islam Sekolah Rendah</p>
+            <p class="text-emerald-500">Direka khas untuk kemudahan guru & murid dalam PdPC Pendidikan Islam.</p>
+        </div>
+    </footer>
+
+    <!-- Main JavaScript Logic -->
+    <script>
+        /* ================= ENJIN PENUKAR RUMI KE JAWI ================= */
+        const rumiToJawiMap = {
+            'ng': 'ڠ', 'ny': 'ڽ', 'sy': 'ش', 'kh': 'خ', 'gh': 'غ', 'dh': 'ض', 'th': 'ث', 'sh': 'ش', 'dz': 'ذ',
+            'a': 'ا', 'b': 'ب', 'c': 'چ', 'd': 'د', 'e': 'اي', 'f': 'ف', 'g': 'ݢ',
+            'h': 'ه', 'i': 'اي', 'j': 'ج', 'k': 'ک', 'l': 'ل', 'm': 'م', 'n': 'ن',
+            'o': 'او', 'p': 'ڤ', 'q': 'ق', 'r': 'ر', 's': 'س', 't': 'ت', 'u': 'او',
+            'v': 'ۏ', 'w': 'و', 'x': 'کسي', 'y': 'ي', 'z': 'ز'
+        };
+
+        const dictionaryDirect = {
+            "pendidikan": "ڤنديديقن", "islam": "إسلام", "tahun": "تأهون", "enam": "انم",
+            "teknologi": "تيکنولوݢي", "maklumat": "معلومات", "komputer": "کومڤوتر", "sains": "ساينس",
+            "internet": "اينترنيت", "ilmu": "عِلْمُ", "cahaya": "نُوْرٌ", "sekolah": "سکوله",
+            "saya": "ساي", "suka": "سوک", "belajar": "بلاجـر", "murid": "موريد",
+            "guru": "ݢورو", "dan": "دان", "khat": "خط", "nasakh": "نسخ", "thuluth": "ثلث"
+        };
+
+        document.getElementById('rumiInput').addEventListener('input', convertRumiToJawi);
+
+        function convertRumiToJawi() {
+            const input = document.getElementById('rumiInput').value.toLowerCase();
+            if (!input.trim()) {
+                document.getElementById('jawiOutput').value = "";
+                return;
+            }
+
+            const words = input.split(/(\s+|[^\w\s])/);
+            const convertedWords = words.map(word => {
+                if (!word || /^\s+$/.test(word) || /[^\w]/.test(word)) return word;
+                if (dictionaryDirect[word]) return dictionaryDirect[word];
+
+                let res = word;
+                res = res.replace(/ng/g, 'ڠ')
+                         .replace(/ny/g, 'ڽ')
+                         .replace(/sy/g, 'ش')
+                         .replace(/kh/g, 'خ')
+                         .replace(/gh/g, 'غ')
+                         .replace(/dh/g, 'ض')
+                         .replace(/th/g, 'ث');
+
+                let output = '';
+                for (let i = 0; i < res.length; i++) {
+                    let char = res[i];
+                    output += rumiToJawiMap[char] || char;
+                }
+                return output;
+            });
+
+            document.getElementById('jawiOutput').value = convertedWords.join('');
+        }
+
+        function setSampleRumi(text) {
+            document.getElementById('rumiInput').value = text;
+            convertRumiToJawi();
+        }
+
+        function copyJawiText() {
+            const txt = document.getElementById('jawiOutput').value;
+            if (!txt) { alert("Tiada teks Jawi untuk disalin."); return; }
+            navigator.clipboard.writeText(txt);
+            alert("Teks Jawi telah disalin!");
+        }
+
+        function sendToKhatStudio() {
+            const txt = document.getElementById('jawiOutput').value;
+            if (txt && txt.trim() !== '') {
+                document.getElementById('khatTextInput').value = txt;
+                switchTab('khat');
+                renderGeneratedKhat();
+            } else {
+                alert("Sila taip atau tukar teks Rumi ke Jawi terlebih dahulu!");
+            }
+        }
+
+        /* ================= STUDIO KHAT GENERATOR ================= */
+        const khatCanvas = document.getElementById('khatCanvas');
+        const kCtx = khatCanvas.getContext('2d');
+        let currentKhatStyle = 'nasakh';
+        let posterBgImage = null;
+
+        function initKhatStudioCanvas() {
+            if (!khatCanvas || !khatCanvas.parentElement) return;
+            const rect = khatCanvas.parentElement.getBoundingClientRect();
+            khatCanvas.width = rect.width;
+            khatCanvas.height = rect.height;
+            renderGeneratedKhat();
+        }
+
+        function setKhatStyle(style) {
+            currentKhatStyle = style;
+            if (style === 'nasakh') {
+                document.getElementById('btnStyleNasakh').className = "px-4 py-2 rounded-xl font-bold text-xs bg-emerald-700 text-white shadow";
+                document.getElementById('btnStyleThuluth').className = "px-4 py-2 rounded-xl font-bold text-xs bg-white text-amber-900 hover:bg-amber-100";
+            } else {
+                document.getElementById('btnStyleThuluth').className = "px-4 py-2 rounded-xl font-bold text-xs bg-amber-600 text-white shadow";
+                document.getElementById('btnStyleNasakh').className = "px-4 py-2 rounded-xl font-bold text-xs bg-white text-emerald-900 hover:bg-emerald-100";
+            }
+            renderGeneratedKhat();
+        }
+
+        function renderGeneratedKhat() {
+            if (!khatCanvas.width) return;
+            const w = khatCanvas.width, h = khatCanvas.height;
+            kCtx.clearRect(0, 0, w, h);
+
+            if (posterBgImage) {
+                kCtx.drawImage(posterBgImage, 0, 0, w, h);
+                kCtx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                kCtx.fillRect(0, 0, w, h);
+            } else {
+                kCtx.fillStyle = '#fffbeb';
+                kCtx.fillRect(0, 0, w, h);
+            }
+
+            const frameStyle = document.getElementById('khatFrameSelect').value;
+            kCtx.save();
+            if (frameStyle === 'gold') {
+                kCtx.strokeStyle = '#d97706'; kCtx.lineWidth = 14; kCtx.strokeRect(12, 12, w - 24, h - 24);
+                kCtx.strokeStyle = '#fbbf24'; kCtx.lineWidth = 4; kCtx.strokeRect(22, 22, w - 44, h - 44);
+            } else if (frameStyle === 'emerald') {
+                kCtx.strokeStyle = '#047857'; kCtx.lineWidth = 12; kCtx.strokeRect(12, 12, w - 24, h - 24);
+            } else if (frameStyle === 'royal') {
+                kCtx.strokeStyle = '#7e22ce'; kCtx.lineWidth = 12; kCtx.strokeRect(12, 12, w - 24, h - 24);
+            }
+            kCtx.restore();
+
+            const text = document.getElementById('khatTextInput').value || 'العِلْمُ نُوْرٌ';
+            const textColor = document.getElementById('khatColorInput').value;
+            const fontSize = parseInt(document.getElementById('khatFontSize').value);
+
+            kCtx.save();
+            kCtx.fillStyle = textColor; kCtx.textAlign = 'center'; kCtx.textBaseline = 'middle';
+
+            if (currentKhatStyle === 'nasakh') {
+                kCtx.font = `bold ${fontSize}px 'Noto Naskh Arabic', 'Amiri', serif`;
+                kCtx.fillText(text, w / 2, h / 2);
+            } else {
+                kCtx.font = `bold ${fontSize + 15}px 'Aref Ruqaa', 'Amiri', serif`;
+                kCtx.fillText(text, w / 2, h / 2 - 10);
+                kCtx.font = `28px 'Amiri', serif`; kCtx.fillStyle = '#d97706';
+                kCtx.fillText(" ً  ّ  ۡ  ۥ ", w / 2, h / 2 - 60);
+            }
+            kCtx.restore();
+        }
+
+        document.getElementById('posterBgUploader').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const img = new Image();
+                    img.onload = function() { posterBgImage = img; renderGeneratedKhat(); }
+                    img.src = evt.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function removePosterBg() {
+            posterBgImage = null;
+            document.getElementById('posterBgUploader').value = "";
+            renderGeneratedKhat();
+        }
+
+        function addStampToKhat(stampText) {
+            const w = khatCanvas.width, h = khatCanvas.height;
+            kCtx.save();
+            const x = w - 90, y = h - 80;
+            kCtx.beginPath(); kCtx.arc(x, y, 36, 0, Math.PI * 2);
+            kCtx.fillStyle = 'rgba(220, 38, 38, 0.9)'; kCtx.fill();
+            kCtx.strokeStyle = '#ffffff'; kCtx.lineWidth = 3; kCtx.stroke();
+            kCtx.fillStyle = '#ffffff'; kCtx.font = 'bold 18px Amiri, serif';
+            kCtx.textAlign = 'center'; kCtx.textBaseline = 'middle';
+            kCtx.fillText(stampText, x, y);
+            kCtx.restore();
+        }
+
+        function clearKhatDrawing() { renderGeneratedKhat(); }
+        function downloadKhatPoster() {
+            const link = document.createElement('a');
+            link.download = 'poster-khat.png';
+            link.href = khatCanvas.toDataURL();
+            link.click();
+        }
+
+
+        /* ================= LOGIK 3 PERMAINAN BERARAS ================= */
+        let activeMiniGame = 'hidden_objects';
+
+        function switchMiniGame(gType) {
+            activeMiniGame = gType;
+            ['hidden_objects', 'escape_room', 'spelling_bee', 'challenge'].forEach(gt => {
+                const el = document.getElementById(`game-${gt}-wrapper`);
+                if (el) el.classList.add('hidden');
+            });
+
+            document.querySelectorAll('.game-btn').forEach(b => b.className = "game-btn px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200");
+
+            const activeWrapper = document.getElementById(`game-${gType}-wrapper`);
+            if (activeWrapper) activeWrapper.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`gbtn-${gType}`);
+            if (activeBtn) activeBtn.className = "game-btn active px-4 py-2 rounded-xl text-xs font-bold bg-teal-600 text-white shadow";
+
+            if (gType !== 'challenge') pauseChallenge();
+            if (gType === 'hidden_objects') loadHiddenObjectsData();
+            else if (gType === 'escape_room') loadEscapeRoomStage(1);
+            else if (gType === 'spelling_bee') initSpellingBeeGame();
+            else if (gType === 'challenge') resumeChallenge();
+        }
+
+        /* ---------------- GAME 1: HIDDEN OBJECTS (BERARAS) ---------------- */
+        let hoLevel = 'rendah';
+        let hoFoundCount = 0;
+        let hoCurrentItem = null;
+
+        const hoDataByLevel = {
+            rendah: [
+                { id: 1, jawi: "بوقو", rumi: "Buku", pos: "top-[25%] left-[20%]", opts: ["Buku", "Baju", "Batu", "Bola"] },
+                { id: 2, jawi: "ݢورو", rumi: "Guru", pos: "top-[60%] left-[50%]", opts: ["Guru", "Guli", "Gula", "Gergaji"] },
+                { id: 3, jawi: "ساي", rumi: "Saya", pos: "top-[35%] right-[20%]", opts: ["Saya", "Satu", "Suka", "Sudu"] }
+            ],
+            sederhana: [
+                { id: 1, jawi: "سکوله", rumi: "Sekolah", pos: "top-[25%] left-[15%]", opts: ["Sekolah", "Sampan", "Sepatu", "Selesa"] },
+                { id: 2, jawi: "کومڤوتر", rumi: "Komputer", pos: "top-[60%] left-[45%]", opts: ["Komputer", "Kamera", "Kereta", "Klinik"] },
+                { id: 3, jawi: "ساينس", rumi: "Sains", pos: "top-[35%] right-[25%]", opts: ["Sains", "Sistem", "Sukan", "Stesen"] },
+                { id: 4, jawi: "موريد", rumi: "Murid", pos: "bottom-[20%] left-[25%]", opts: ["Murid", "Muzium", "Meja", "Menara"] }
+            ],
+            tinggi: [
+                { id: 1, jawi: "تيکنولوݢي", rumi: "Teknologi", pos: "top-[20%] left-[15%]", opts: ["Teknologi", "Televisyen", "Telefon", "Teleskop"] },
+                { id: 2, jawi: "اينترنيت", rumi: "Internet", pos: "top-[55%] left-[40%]", opts: ["Internet", "Industri", "Inovasi", "Institut"] },
+                { id: 3, jawi: "کوريکولوم", rumi: "Kurikulum", pos: "top-[30%] right-[20%]", opts: ["Kurikulum", "Kraf tangan", "Komunikasi", "Klinikal"] },
+                { id: 4, jawi: "ڤرڤوستاکاءن", rumi: "Perpustakaan", pos: "bottom-[20%] left-[30%]", opts: ["Perpustakaan", "Pendidikan", "Pemeriksaan", "Pentadbiran"] },
+                { id: 5, jawi: "خط النسخ", rumi: "Khat Nasakh", pos: "top-[15%] right-[45%]", opts: ["Khat Nasakh", "Khat Thuluth", "Khat Kufi", "Khat Riqah"] }
+            ]
+        };
+
+        function setHoLevel(lvl) {
+            hoLevel = lvl;
+            ['rendah', 'sederhana', 'tinggi'].forEach(l => {
+                const btn = document.getElementById(`ho-lvl-${l}`);
+                if (btn) btn.className = `px-3 py-1 rounded-xl text-xs font-bold ${l === lvl ? `level-badge-${l} shadow` : 'bg-slate-100 text-slate-600'}`;
+            });
+            loadHiddenObjectsData();
+        }
+
+        function loadHiddenObjectsData() {
+            hoFoundCount = 0;
+            const container = document.getElementById('hoItemsContainer');
+            container.innerHTML = "";
+            document.getElementById('hoComplete').classList.add('hidden');
+
+            const items = hoDataByLevel[hoLevel];
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.id = `ho-item-${item.id}`;
+                div.className = `absolute ${item.pos} bg-amber-400/90 text-slate-950 font-jawi font-black px-3 py-1.5 rounded-2xl shadow-2xl cursor-pointer hover:scale-110 transition border-2 border-white text-xl`;
+                div.innerText = item.jawi;
+                div.onclick = () => findHiddenItem(item);
+                container.appendChild(div);
+            });
+        }
+
+        function findHiddenItem(item) {
+            const el = document.getElementById(`ho-item-${item.id}`);
+            if (el.classList.contains('hidden-item-found')) return;
+
+            hoCurrentItem = { ...item, el };
+            document.getElementById('hoJawiFound').innerText = item.jawi;
+
+            let optsHtml = '';
+            item.opts.sort(() => Math.random() - 0.5).forEach(opt => {
+                optsHtml += `<button onclick="checkHiddenMatch('${opt}')" class="bg-teal-700 hover:bg-teal-800 text-white font-bold p-3 rounded-xl text-xs transition">${opt}</button>`;
+            });
+
+            document.getElementById('hoOptions').innerHTML = optsHtml;
+            document.getElementById('hoModal').classList.remove('hidden');
+        }
+
+        function checkHiddenMatch(selected) {
+            document.getElementById('hoModal').classList.add('hidden');
+            if (selected === hoCurrentItem.rumi) {
+                alert("TAHNIAH! Padanan Maksud Betul!");
+                hoCurrentItem.el.classList.add('hidden-item-found');
+                hoFoundCount++;
+
+                const total = hoDataByLevel[hoLevel].length;
+                if (hoFoundCount >= total) {
+                    document.getElementById('hoComplete').classList.remove('hidden');
+                }
+            } else {
+                alert("KURANG TEPAT! Sila cuba lagi.");
+            }
+        }
+
+        function resetHiddenObjects() {
+            loadHiddenObjectsData();
+        }
+
+
+        /* ---------------- GAME 2: ESCAPE ROOM (BERARAS) ---------------- */
+        let erLevel = 'rendah';
+        let erCurrentStage = 1;
+
+        function setErLevel(lvl) {
+            erLevel = lvl;
+            ['rendah', 'sederhana', 'tinggi'].forEach(l => {
+                const btn = document.getElementById(`er-lvl-${l}`);
+                if (btn) btn.className = `px-3 py-1 rounded-xl text-xs font-bold ${l === lvl ? `level-badge-${l} shadow` : 'bg-slate-700 text-slate-300'}`;
+            });
+            loadEscapeRoomStage(1);
+        }
+
+        function loadEscapeRoomStage(stage) {
+            erCurrentStage = stage;
+            const box = document.getElementById('erStageContent');
+
+            if (erLevel === 'rendah') {
+                box.innerHTML = `
+                    <h4 class="font-bold text-amber-300 text-lg">Peringkat ${stage}: Pengenalan Huruf Hijaiyah & Sambungan</h4>
+                    <p class="text-xs text-slate-300">Pilih huruf yang <strong>TIDAK BOLEH menyambung huruf selepasnya</strong> (Huruf Sombong):</p>
+                    <div class="grid grid-cols-3 gap-3 pt-2">
+                        <button onclick="checkEscapeRoom(true)" class="bg-slate-700 hover:bg-slate-600 p-4 rounded-xl font-jawi text-3xl text-amber-300">د</button>
+                        <button onclick="checkEscapeRoom(false)" class="bg-slate-700 hover:bg-slate-600 p-4 rounded-xl font-jawi text-3xl">ب</button>
+                        <button onclick="checkEscapeRoom(false)" class="bg-slate-700 hover:bg-slate-600 p-4 rounded-xl font-jawi text-3xl">ت</button>
+                    </div>
+                `;
+            } else if (erLevel === 'sederhana') {
+                box.innerHTML = `
+                    <h4 class="font-bold text-amber-300 text-lg">Peringkat ${stage}: Sejarah & Kata Pinjaman</h4>
+                    <p class="text-xs text-slate-300">Manakah ejaan Jawi yang BETUL bagi kata pinjaman **"INTERNET"**?</p>
+                    <div class="grid grid-cols-3 gap-3 pt-2">
+                        <button onclick="checkEscapeRoom(false)" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-xl font-jawi text-2xl">انتيرنيت</button>
+                        <button onclick="checkEscapeRoom(true)" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-xl font-jawi text-2xl text-amber-300">اينترنيت</button>
+                        <button onclick="checkEscapeRoom(false)" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-xl font-jawi text-2xl">اينترنيط</button>
+                    </div>
+                `;
+            } else {
+                box.innerHTML = `
+                    <h4 class="font-bold text-amber-300 text-lg">Peringkat ${stage}: Analisis Sejarah Jawi & Seni Khat</h4>
+                    <p class="text-xs text-slate-300">Apakah bukti tertua penggunaan penulisan Tulisan Jawi secara rasmi di Malaysia?</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        <button onclick="checkEscapeRoom(true)" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-xl text-xs font-bold text-amber-300">Batu Bersurat Terengganu (1303M)</button>
+                        <button onclick="checkEscapeRoom(false)" class="bg-slate-700 hover:bg-slate-600 p-3 rounded-xl text-xs font-bold">Hukum Kanun Melaka</button>
+                    </div>
+                `;
+            }
+        }
+
+        function checkEscapeRoom(isCorrect) {
+            if (isCorrect) {
+                document.getElementById('erStageContent').innerHTML = `
+                    <div class="text-center space-y-4 py-6">
+                        <div class="text-6xl text-amber-400"><i class="fa-solid fa-door-open"></i></div>
+                        <h3 class="text-2xl font-bold text-emerald-400">PINTU KELUAR BERJAYA DIBUKA!</h3>
+                        <p class="text-xs text-slate-300">Tahniah! Anda telah berjaya menyelesaikan Escape Room Jawi pada Aras <strong>${erLevel.toUpperCase()}</strong>!</p>
+                        <button onclick="loadEscapeRoomStage(1)" class="bg-amber-400 text-slate-950 font-black px-6 py-2.5 rounded-xl">Main Semula</button>
+                    </div>
+                `;
+            } else {
+                alert("SALAH! Jawapan kurang tepat. Cuba lagi!");
+            }
+        }
+
+
+        /* ---------------- GAME 3: JAWI SPELLING BEE (BERARAS) ---------------- */
+        let beeLevel = 'rendah';
+        let currentBeeIdx = 0;
+        let userBeeSpelling = [];
+
+        const beeWordsByLevel = {
+            rendah: [
+                { rumi: "BUKU", jawiLetters: ["ب", "و", "ک", "و"], hint: "bu-ku" },
+                { rumi: "BOLA", jawiLetters: ["ب", "و", "ل", "ا"], hint: "bo-la" }
+            ],
+            sederhana: [
+                { rumi: "KOMPUTER", jawiLetters: ["ک", "و", "م", "ڤ", "و", "ت", "ر"], hint: "kom-pu-ter" },
+                { rumi: "SAINS", jawiLetters: ["س", "ا", "ي", "ن", "س"], hint: "sa-ins" }
+            ],
+            tinggi: [
+                { rumi: "TEKNOLOGI", jawiLetters: ["ت", "ي", "ک", "ن", "و", "ل", "و", "ݢ", "ي"], hint: "tek-no-lo-gi" },
+                { rumi: "PERPUSTAKAAN", jawiLetters: ["ڤ", "ر", "ڤ", "و", "س", "ت", "ا", "ک", "ا", "ء", "ن"], hint: "per-pus-ta-ka-an" }
+            ]
+        };
+
+        function setBeeLevel(lvl) {
+            beeLevel = lvl;
+            ['rendah', 'sederhana', 'tinggi'].forEach(l => {
+                const btn = document.getElementById(`bee-lvl-${l}`);
+                if (btn) btn.className = `px-3 py-1 rounded-xl text-xs font-bold ${l === lvl ? `level-badge-${l} shadow` : 'bg-slate-700 text-slate-300'}`;
+            });
+            initSpellingBeeGame();
+        }
+
+        function initSpellingBeeGame() {
+            currentBeeIdx = 0;
+            loadSpellingBeeQuestion();
+        }
+
+        function loadSpellingBeeQuestion() {
+            userBeeSpelling = [];
+            const wordsList = beeWordsByLevel[beeLevel];
+            const wordObj = wordsList[currentBeeIdx];
+            const container = document.getElementById('spellingBeeContainer');
+
+            const shuffledLetters = [...wordObj.jawiLetters].sort(() => Math.random() - 0.5);
+
+            container.innerHTML = `
+                <div class="space-y-4">
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Soalan ${currentBeeIdx + 1} daripada ${wordsList.length} (Aras ${beeLevel.toUpperCase()})</span>
+                    <h4 class="text-2xl font-black text-amber-300">Eja perkataan: "${wordObj.rumi}" (${wordObj.hint})</h4>
+                    
+                    <div id="beeUserDisplay" class="bg-slate-800 border-2 border-amber-400/50 rounded-2xl p-4 min-h-[70px] flex justify-center items-center gap-2 font-jawi text-3xl text-amber-300">
+                        <span class="text-slate-500 text-sm font-sans">Klik huruf di bawah mengikut urutan...</span>
+                    </div>
+
+                    <div id="beeLetterButtons" class="flex flex-wrap justify-center gap-2 pt-2">
+                        ${shuffledLetters.map((ltr) => `
+                            <button onclick="pickBeeLetter('${ltr}', this)" class="bg-amber-500 hover:bg-amber-400 active:scale-90 text-slate-950 font-jawi font-black text-3xl w-12 h-12 rounded-2xl shadow-lg border-2 border-white transition flex items-center justify-center">${ltr}</button>
+                        `).join('')}
+                    </div>
+
+                    <div class="flex justify-center gap-3 pt-2">
+                        <button onclick="resetCurrentBeeWord()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold px-4 py-2 rounded-xl text-xs">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Padam
+                        </button>
+                        <button onclick="checkBeeSpelling()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-6 py-2 rounded-xl text-xs shadow-md">
+                            <i class="fa-solid fa-check mr-1"></i> Semak Jawapan
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function pickBeeLetter(letter, btnEl) {
+            btnEl.disabled = true;
+            btnEl.classList.add('opacity-30', 'pointer-events-none');
+            userBeeSpelling.push({ letter, btnEl });
+
+            const display = document.getElementById('beeUserDisplay');
+            display.innerHTML = userBeeSpelling.map(item => `<span class="bg-amber-400 text-slate-950 px-3 py-1 rounded-xl">${item.letter}</span>`).join('');
+        }
+
+        function resetCurrentBeeWord() {
+            userBeeSpelling.forEach(item => {
+                item.btnEl.disabled = false;
+                item.btnEl.classList.remove('opacity-30', 'pointer-events-none');
+            });
+            userBeeSpelling = [];
+            document.getElementById('beeUserDisplay').innerHTML = `<span class="text-slate-500 text-sm font-sans">Klik huruf di bawah mengikut urutan...</span>`;
+        }
+
+        function checkBeeSpelling() {
+            const wordsList = beeWordsByLevel[beeLevel];
+            const correctTarget = wordsList[currentBeeIdx].jawiLetters.join('');
+            const userTarget = userBeeSpelling.map(i => i.letter).join('');
+
+            if (userTarget === correctTarget) {
+                alert("TAHNIAH! Ejaan Jawi anda tepat!");
+                currentBeeIdx++;
+                if (currentBeeIdx < wordsList.length) {
+                    loadSpellingBeeQuestion();
+                } else {
+                    document.getElementById('spellingBeeContainer').innerHTML = `
+                        <div class="py-6 space-y-4">
+                            <div class="text-5xl text-amber-400"><i class="fa-solid fa-award"></i></div>
+                            <h3 class="text-3xl font-extrabold text-emerald-400">TAMAT ARAS ${beeLevel.toUpperCase()}!</h3>
+                            <p class="text-xs text-slate-300">Anda telah berjaya menyusun kesemua perkataan Jawi pada aras ini!</p>
+                            <button onclick="initSpellingBeeGame()" class="bg-amber-400 text-slate-950 font-black px-6 py-2.5 rounded-xl">Main Semula</button>
+                        </div>
+                    `;
+                }
+            } else {
+                alert("KURANG TEPAT! Sila semak semula urutan huruf Jawi.");
+                resetCurrentBeeWord();
+            }
+        }
+
+
+        /* ================= CABARAN JUARA JAWI: MOD BERMARKAH ================= */
+        const challengeStages = ['Hidden Objects', 'Escape Room', 'Spelling Bee'];
+        const challengeQuestions = [
+            [
+                {jawi:'تيکنولوݢي', answer:'Teknologi', opts:['Televisyen','Teknologi','Teleskop','Telefon'], pos:[23,20]},
+                {jawi:'اينترنيت', answer:'Internet', opts:['Inovasi','Industri','Internet','Institut'], pos:[58,55]},
+                {jawi:'کومڤوتر', answer:'Komputer', opts:['Komunikasi','Kamera','Komputer','Kurikulum'], pos:[28,76]}
+            ],
+            [
+                {q:'Apakah bukti penting penggunaan tulisan Jawi di Terengganu pada tahun 1303 Masihi?', opts:['Batu Bersurat Terengganu','Hukum Kanun Melaka','Surat Perjanjian Pangkor'], answer:0},
+                {q:'Khat manakah terkenal dengan huruf bertingkat, bersilang dan hiasan yang berseni?',opts:['Khat Nasakh','Khat Thuluth','Khat Riqah'],answer:1},
+                {q:'Yang manakah kumpulan huruf yang tidak menyambung kepada huruf selepasnya?',opts:['ب، ت، ث','س، ش، ص','ا، د، ر'],answer:2}
+            ],
+            [
+                {rumi:'TEKNOLOGI', letters:['ت','ي','ک','ن','و','ل','و','ݢ','ي']},
+                {rumi:'KOMPUTER', letters:['ک','و','م','ڤ','و','ت','ر']},
+                {rumi:'SAINS', letters:['س','ا','ي','ن','س']}
+            ]
+        ];
+        // Gantikan URL di bawah dengan pautan /exec Google Apps Script anda.
+        const CHALLENGE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz8_UV3e4JIw9-zOZPcvWt2wS5WzJceQVaEyX9RMHV9ClyB1iwiiamMOcQv6UF1MGc/exec';
+        let challengeStudent = {name:'', studentClass:''};
+        let challengeStageScores = [0,0,0];
+        let challengeSubmissionId = '';
+        let challenge = {started:false, finished:false, stage:0, index:0, score:0, seconds:180, timer:null, paused:false, selected:[], busy:false};
+        function shuffleChallenge(arr) {const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+        function updateChallengeHud(){
+            document.getElementById('challengeStage').textContent=challenge.started?(challenge.stage+1)+'/3 · '+challengeStages[challenge.stage]:'—';
+            document.getElementById('challengeTimer').textContent=String(Math.floor(challenge.seconds/60)).padStart(2,'0')+':'+String(challenge.seconds%60).padStart(2,'0');
+            document.getElementById('challengeScore').textContent=challenge.score;
+        }
+        function pauseChallenge(){if(challenge.timer){clearInterval(challenge.timer);challenge.timer=null;}challenge.paused=true;}
+        function resumeChallenge(){if(challenge.started&&!challenge.finished){challenge.paused=false;runChallengeTimer();}}
+        function runChallengeTimer(){
+            if(challenge.timer||!challenge.started||challenge.finished||challenge.paused)return;
+            challenge.timer=setInterval(()=>{challenge.seconds=Math.max(0,challenge.seconds-1);updateChallengeHud();if(challenge.seconds===0){clearInterval(challenge.timer);challenge.timer=null;advanceChallengeStage();}},1000);
+        }
+        function startChallenge(){
+            if(!challenge.finished){
+                const nameEl=document.getElementById('challengeStudentName');
+                const classEl=document.getElementById('challengeStudentClass');
+                if(nameEl && classEl){
+                    const name=nameEl.value.trim(), studentClass=classEl.value.trim();
+                    if(!name){document.getElementById('challengeSetupError').textContent='Sila masukkan nama individu atau kumpulan.';return;}
+                    challengeStudent={name,studentClass:studentClass||'-'};
+                }
+            }
+            if(!challengeStudent.name||!challengeStudent.studentClass){alert('Sila masukkan nama individu atau kumpulan.');return;}
+            pauseChallenge();challengeStageScores=[0,0,0];
+            challengeSubmissionId='jawi-'+Date.now()+'-'+Math.random().toString(36).slice(2,12);
+            challenge={started:true,finished:false,stage:0,index:0,score:0,seconds:180,timer:null,paused:false,selected:[],busy:false};updateChallengeHud();renderChallengeQuestion();runChallengeTimer();
+        }
+        function challengeFeedback(correct){
+            if(!challenge.started||challenge.finished||challenge.busy)return;
+            challenge.busy=true;
+            if(correct){challenge.score+=5;challengeStageScores[challenge.stage]+=5;}else{challenge.score-=2;challengeStageScores[challenge.stage]-=2;challenge.seconds=Math.max(0,challenge.seconds-5);}
+            updateChallengeHud();
+            const feedback=document.getElementById('challengeFeedback');
+            if(feedback){feedback.textContent=correct?'✓ BETUL! +5 markah':'✕ SALAH! −2 markah, −5 saat';feedback.className='font-black text-lg '+(correct?'text-emerald-400':'text-rose-400');}
+            if(challenge.seconds===0){clearInterval(challenge.timer);challenge.timer=null;advanceChallengeStage();return;}
+            if(correct){challenge.index++; if(challenge.index===3){advanceChallengeStage();return;}setTimeout(()=>{if(challenge.started&&!challenge.finished){challenge.busy=false;renderChallengeQuestion();}},550);}else{challenge.busy=false;}
+        }
+        function advanceChallengeStage(){
+            pauseChallenge();challenge.stage++;challenge.index=0;challenge.selected=[];challenge.busy=false;
+            if(challenge.stage>=3){finishChallenge();return;}
+            challenge.seconds=180;challenge.paused=false;updateChallengeHud();
+            document.getElementById('challengeContent').innerHTML=`<div class="text-5xl text-amber-400">★</div><h4 class="text-2xl font-black">Bahagian sebelumnya selesai!</h4><p class="text-slate-300 text-sm">Seterusnya: ${challengeStages[challenge.stage]} · 3 soalan · 3 minit</p><button onclick="beginNextChallengeStage()" class="bg-amber-400 text-slate-950 font-black px-6 py-3 rounded-xl">Teruskan ke Permainan ${challenge.stage+1}</button>`;
+            challenge.paused=true;
+        }
+        function beginNextChallengeStage(){if(!challenge.started||challenge.finished)return;challenge.paused=false;renderChallengeQuestion();runChallengeTimer();}
+        function escapeChallengeHtml(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+        async function submitChallengeResult(){
+            const status=document.getElementById('challengeSaveStatus');
+            const btn=document.getElementById('challengeSaveRetry');
+            if(!status)return;
+            if(!/^https:\/\/script\.google\.com\/macros\/s\/.+\/exec$/.test(CHALLENGE_SHEETS_URL)){
+                status.textContent='Google Sheets belum disambungkan. Guru perlu memasukkan URL Web App /exec dalam kod HTML.';return;
+            }
+            if(btn)btn.disabled=true;
+            status.textContent='Menghantar keputusan ke Google Sheets…';
+            const payload={submissionId:challengeSubmissionId,nama:challengeStudent.name,kelas:challengeStudent.studentClass,hiddenObjects:challengeStageScores[0],escapeRoom:challengeStageScores[1],spellingBee:challengeStageScores[2],jumlah:challenge.score,source:'Cabaran Juara Jawi'};
+            try{
+                // no-cors diperlukan untuk Web App Apps Script dari laman HTML statik.
+                // Respons opaque: pelayar tidak dapat mengesahkan bahawa Sheets telah menerima rekod.
+                await fetch(CHALLENGE_SHEETS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});
+                status.textContent='Permintaan dihantar, tetapi penerimaan belum dapat disahkan. Semak Google Sheets. Jika tiada rekod, tekan Cuba Hantar Semula selepas guru membetulkan Apps Script.';
+            }catch(e){status.textContent='Penghantaran gagal (rangkaian). Tekan Cuba Hantar Semula.';}
+            if(btn)btn.disabled=false;
+        }
+        function finishChallenge(){
+            pauseChallenge();challenge.finished=true;challenge.started=false;updateChallengeHud();const max=45;
+            document.getElementById('challengeContent').innerHTML=`<div class="text-6xl text-amber-400"><i class="fa-solid fa-trophy"></i></div><h3 class="text-3xl font-black">CABARAN TAMAT!</h3><p class="text-slate-300">${escapeChallengeHtml(challengeStudent.name)} · ${escapeChallengeHtml(challengeStudent.studentClass)}</p><div class="text-6xl font-black text-amber-300">${challenge.score} <span class="text-lg">/ ${max}</span></div><div class="grid grid-cols-3 gap-2 text-xs"><div>Hidden Objects<br><strong>${challengeStageScores[0]}</strong></div><div>Escape Room<br><strong>${challengeStageScores[1]}</strong></div><div>Spelling Bee<br><strong>${challengeStageScores[2]}</strong></div></div><p id="challengeSaveStatus" class="text-sm text-amber-200" role="status">Bersedia menghantar…</p><button id="challengeSaveRetry" onclick="submitChallengeResult()" class="bg-teal-600 text-white font-bold px-5 py-2 rounded-xl">Cuba Hantar Semula</button><button onclick="startChallenge()" class="bg-amber-400 text-slate-950 font-black px-7 py-3 rounded-xl">Main Semula</button>`;
+            document.getElementById('challengeStage').textContent='TAMAT';
+            submitChallengeResult();
+        }
+        function renderChallengeQuestion(){
+            if(!challenge.started||challenge.finished||challenge.paused)return;
+            challenge.selected=[];challenge.busy=false;
+            const box=document.getElementById('challengeContent');const q=challengeQuestions[challenge.stage][challenge.index];
+            let html=`<div class="text-xs font-bold text-amber-300 uppercase tracking-widest">${challengeStages[challenge.stage]} · Soalan ${challenge.index+1} daripada 3</div>`;
+            if(challenge.stage===0){
+                html+=`<p class="text-sm text-slate-300">Cari dan klik objek Jawi tersembunyi, kemudian padankan maksudnya.</p><div class="relative h-48 rounded-2xl overflow-hidden border-2 border-teal-400 bg-gradient-to-br from-slate-700 via-teal-900 to-slate-800">`;
+                const decoys=['بوقو','سکوله','موريد'];
+                decoys.forEach((d,i)=>html+=`<span class="absolute opacity-35 font-jawi text-2xl" style="left:${15+i*30}%;top:${18+i*22}%">${d}</span>`);
+                html+=`<button onclick="showChallengeHiddenOptions()" class="absolute bg-amber-400/90 hover:bg-amber-300 text-slate-950 font-jawi text-2xl font-black px-4 py-2 rounded-xl shadow-xl" style="left:${q.pos[0]}%;top:${q.pos[1]}%">${q.jawi}</button></div><div id="challengeHiddenOptions" class="grid grid-cols-2 gap-2"></div>`;
+            }else if(challenge.stage===1){
+                html+=`<div class="text-5xl text-amber-400"><i class="fa-solid fa-lock"></i></div><h4 class="text-lg font-bold">${q.q}</h4><div class="grid grid-cols-1 gap-2">${shuffleChallenge(q.opts.map((opt,i)=>({opt,i}))).map(o=>`<button onclick="answerChallengeEscape(${o.i})" class="bg-slate-700 hover:bg-slate-600 border border-slate-500 rounded-xl p-3 text-sm font-bold">${o.opt}</button>`).join('')}</div>`;
+            }else{
+                const shuffled=shuffleChallenge(q.letters.map((letter,i)=>({letter,i})));
+                html+=`<h4 class="text-xl font-black text-amber-300">Susun ejaan Jawi: ${q.rumi}</h4><div id="challengeSpellingDisplay" dir="rtl" class="min-h-[64px] bg-slate-800 rounded-xl border border-amber-500 p-3 font-jawi text-3xl text-amber-300">Pilih huruf...</div><div class="flex flex-wrap justify-center gap-2">${shuffled.map(o=>`<button data-challenge-letter="${o.i}" onclick="pickChallengeLetter(${o.i},this)" class="bg-amber-400 text-slate-950 font-jawi text-3xl font-black w-12 h-12 rounded-xl">${o.letter}</button>`).join('')}</div><div class="flex gap-3 justify-center"><button onclick="clearChallengeSpelling()" class="bg-slate-600 px-5 py-2 rounded-xl">Padam</button><button onclick="checkChallengeSpelling()" class="bg-emerald-600 px-5 py-2 rounded-xl font-bold">Semak Jawapan</button></div>`;
+            }
+            box.innerHTML=html+'<div id="challengeFeedback" class="min-h-[28px]" aria-live="polite"></div>';
+        }
+        function showChallengeHiddenOptions(){if(challenge.busy||challenge.stage!==0)return;const q=challengeQuestions[0][challenge.index];document.getElementById('challengeHiddenOptions').innerHTML=shuffleChallenge(q.opts).map(opt=>`<button onclick="answerChallengeHidden('${opt}')" class="bg-teal-700 hover:bg-teal-600 p-3 rounded-xl text-sm font-bold">${opt}</button>`).join('');}
+        function answerChallengeHidden(answer){if(challenge.stage!==0||challenge.busy)return;challengeFeedback(answer===challengeQuestions[0][challenge.index].answer);}
+        function answerChallengeEscape(i){if(challenge.stage!==1||challenge.busy)return;challengeFeedback(i===challengeQuestions[1][challenge.index].answer);}
+        function pickChallengeLetter(i,btn){if(challenge.stage!==2||challenge.busy||btn.disabled)return;challenge.selected.push(i);btn.disabled=true;btn.classList.add('opacity-30');const q=challengeQuestions[2][challenge.index];document.getElementById('challengeSpellingDisplay').textContent=challenge.selected.map(n=>q.letters[n]).join('');}
+        function clearChallengeSpelling(){if(challenge.stage!==2||challenge.busy)return;challenge.selected=[];document.querySelectorAll('[data-challenge-letter]').forEach(btn=>{btn.disabled=false;btn.classList.remove('opacity-30');});document.getElementById('challengeSpellingDisplay').textContent='Pilih huruf...';}
+        function checkChallengeSpelling(){if(challenge.stage!==2||challenge.busy||!challenge.selected.length)return;const q=challengeQuestions[2][challenge.index];const correct=challenge.selected.map(i=>q.letters[i]).join('')===q.letters.join('')&&challenge.selected.length===q.letters.length;challengeFeedback(correct);if(!correct&&challenge.started&&!challenge.finished&&challenge.stage===2)clearChallengeSpelling();}
+
+        window.onload = function() {
+            initKhatStudioCanvas();
+            loadHiddenObjectsData();
+        };
+
+        window.addEventListener('resize', () => {
+            initKhatStudioCanvas();
+        });
+    </script>
+</body>
+</html>
